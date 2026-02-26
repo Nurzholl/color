@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Игра Смена Цветов</title>
+	<style>
+		#field td {
+			width: 50px;
+			height: 50px;
+			border: 1px solid black;
+			text-align: center;
+			font-weight: bold;
+			cursor: pointer;
+		}
+
+		/* Цвета из задания */
+		.red { background: red; }
+		.green { background: green; }
+		.blue { background: blue; }
+
+		#info { margin-bottom: 10px; font-size: 1.2em; }
+	</style>
+</head>
+<body>
+
+<div id="info">Ходов: <span id="counter">0</span></div>
+<table id="field"></table>
+
+<script>
+	let field = document.querySelector('#field');
+	let counterDisplay = document.querySelector('#counter');
+
+	let rows = 3;
+	let cols = 3;
+	let colors = ['red', 'green', 'blue'];
+	let clicks = 0;
+
+	// 1. Функция получения случайного элемента
+	function getRandomElement(arr) {
+		let randIndex = Math.floor(Math.random() * arr.length);
+		return arr[randIndex];
+	}
+
+	// 2. Функция получения следующего элемента (по кругу)
+	function getNextElement(arr, currentElem) {
+		let currentIndex = arr.indexOf(currentElem);
+		let nextIndex = (currentIndex + 1) % arr.length;
+		return arr[nextIndex];
+	}
+
+	// 3. Функция проверки победы
+	function isVictory() {
+		let cells = document.querySelectorAll('#field td');
+		let firstColor = cells[0].className; // Берем цвет первой ячейки
+		
+		for (let cell of cells) {
+			if (cell.className !== firstColor) {
+				return false; // Если хоть одна ячейка отличается — еще не победа
+			}
+		}
+		return true;
+	}
+
+	// 4. Отрисовка таблицы
+	for (let i = 0; i < rows; i++) {
+		let tr = document.createElement('tr');
+		
+		for (let j = 0; j < cols; j++) {
+			let td = document.createElement('td');
+			
+			// Назначаем случайный класс при создании
+			td.classList.add(getRandomElement(colors));
+			
+			// Событие клика
+			td.addEventListener('click', function() {
+				clicks++;
+				counterDisplay.textContent = clicks;
+
+				let currentColor = this.className; // Получаем текущий цвет
+				let nextColor = getNextElement(colors, currentColor);
+				
+				this.className = nextColor; // Меняем на следующий
+
+				// Проверка на победу
+				if (isVictory()) {
+					// Небольшая задержка, чтобы браузер успел отрисовать последний цвет
+					setTimeout(() => {
+						alert('Победа! Вы собрали поле за ' + clicks + ' ходов!');
+					}, 100);
+				}
+			});
+			
+			tr.appendChild(td);
+		}
+		field.appendChild(tr);
+	}
+</script>
+
+</body>
+</html>
